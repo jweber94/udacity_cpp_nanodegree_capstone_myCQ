@@ -19,11 +19,11 @@ add_library(custom_net_lib INTERFACE) # The INTERFACE keyword indicates, that th
 target_include_directories(custom_net_lib INTERFACE include/custom_net_lib/ ${Boost_INCLUDE_DIRS})
 target_link_libraries(custom_net_lib INTERFACE ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(myCQ_client src/main_client.cpp)
+add_executable(myCQ_client src/main_client.cpp src/myCQ_client.cpp src/myCQ_client.cpp src/myCQ_client.hpp)
 target_link_libraries(myCQ_client PRIVATE custom_net_lib ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 target_include_directories(myCQ_client PRIVATE include ${Boost_INCLUDE_DIRS})
 
-add_executable(myCQ_server src/main_server.cpp)
+add_executable(myCQ_server src/main_server.cpp src/myCQ_server.cpp src/myCQ_server.hpp)
 target_link_libraries(myCQ_server PRIVATE custom_net_lib ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 target_include_directories(myCQ_server PRIVATE include ${Boost_INCLUDE_DIRS})
 

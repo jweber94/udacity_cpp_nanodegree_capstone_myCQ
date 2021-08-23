@@ -1,50 +1,18 @@
 #include "custom_net_lib.hpp"
+#include "myCQ_client.hpp"
+
+#include <boost/program_options.hpp>
 #include <chrono>
 #include <future>
 #include <iostream>
 #include <set>
 #include <stdio.h>
 #include <thread>
-#include <boost/program_options.hpp>
 
-std::set<char> possable_inputs{'a', 'd', 'p', 'm',
-                               's', 'q', ''}; // The last element is ctrl+c
+// Util functions - keyboard input
+std::set<char> possable_inputs{'p', 'm', 'l',
+                               'n', 'q', ''}; // The last element is ctrl+c
 
-enum class CustomMsgTypes : uint32_t {
-  ServerAccept,
-  ServerDeny,
-  ServerPing,
-  MessageAll,
-  ServerMessage
-};
-
-class CustomClient : public custom_netlib::ClientBaseInterface<CustomMsgTypes> {
-public:
-  void PingServer() {
-    custom_netlib::message<CustomMsgTypes> msg;
-    msg.header.id = CustomMsgTypes::ServerPing;
-
-    std::chrono::system_clock::time_point now_pc_clock =
-        std::chrono::system_clock::
-            now(); // CAUTION: Only works properly if the server host and the
-                   // client host has the same system clock sent this to the
-                   // server and he will it back to you so we can calculate the
-                   // round trip time in the upcoming lines of code
-    msg << now_pc_clock;
-
-    Send(msg);
-  }
-
-  void MessageAll() {
-    custom_netlib::message<CustomMsgTypes> msg;
-    msg.header.id = CustomMsgTypes::MessageAll;
-    Send(msg);
-  }
-
-private:
-};
-
-// Util functions
 void get_keyboard_input(std::promise<char> *promObj) {
   char input = 'a';
   while (true) //(input != 'q') && (input != '^C'))
@@ -58,13 +26,18 @@ void get_keyboard_input(std::promise<char> *promObj) {
         promObj->set_value(input);
         return;
       } else {
-        std::cout << " was your input\n";
+        // all other valid inputs
+        std::cout << " was your input.\n";
         promObj->set_value(input);
         return;
       }
-
     } else {
-      std::cout << " was your input - no action triggered.\n";
+      std::cout << " was your input which is not a valid. Please try again "
+                   "with\n p \t "
+                   "ping\nm \t message all clients with a message that you "
+                   "will insert\nl \t list all connected clients by their "
+                   "ID\nn \t notify one of the clients by ID\nto interact "
+                   "with the server or quit the program by pressing q.\n\n";
     }
   }
 }
@@ -77,33 +50,34 @@ int main(int argc, const char *argv[]) {
 
   // command line parser
   uint32_t port_num = 0;
-  std::string ip_addr = "127.0.0.1";  
+  std::string ip_addr = "127.0.0.1";
   boost::program_options::options_description desc{
       "Options for the chatbot client."};
   boost::program_options::variables_map vm;
 
-  desc.add_options()(
-        "help,h", "Help and overview of all possible command line options")(
-        "port,p",
-        boost::program_options::value<uint32_t>()->default_value(60000),
-        "Port where the client should try to connect to the server.")
-        ("addr,a", boost::program_options::value<std::string>()->default_value("127.0.0.1"), "IP-address where the client should try to connect to find the server.");
+  desc.add_options()("help,h",
+                     "Help and overview of all possible command line options")(
+      "port,p", boost::program_options::value<uint32_t>()->default_value(60000),
+      "Port where the client should try to connect to the server.")(
+      "addr,a",
+      boost::program_options::value<std::string>()->default_value("127.0.0.1"),
+      "IP-address where the client should try to connect to find the server.");
 
-    boost::program_options::store(
-        boost::program_options::parse_command_line(argc, argv, desc), vm);
-    boost::program_options::notify(vm);
+  boost::program_options::store(
+      boost::program_options::parse_command_line(argc, argv, desc), vm);
+  boost::program_options::notify(vm);
 
-    ip_addr = vm["addr"].as<std::string>();
-    port_num = vm["port"].as<uint32_t>(); 
+  ip_addr = vm["addr"].as<std::string>();
+  port_num = vm["port"].as<uint32_t>();
 
-    if (vm.count("help")) {
-      std::cout << desc << "\n";
-      exit(0);
-    }
+  if (vm.count("help")) {
+    std::cout << desc << "\n";
+    exit(0);
+  }
 
   CustomClient client;
-  //client.Connect("127.0.0.1", 60000);
-  client.Connect(ip_addr, port_num); 
+  // client.Connect("127.0.0.1", 60000);
+  client.Connect(ip_addr, port_num);
 
   char input_character =
       'y'; // default value to not get randomly blocked since we are not under
@@ -128,22 +102,19 @@ int main(int argc, const char *argv[]) {
       }
 
       switch (input_character) {
-      case 'a':
-        std::cout << "server accept\n";
+      case 'l':
+        std::cout << "list all connected clients\n";
         break;
-      case 'd':
-        std::cout << "server deny\n";
+      case 'n':
+        std::cout << "notify one client\n";
         break;
       case 'p':
         std::cout << "server ping\n";
         client.PingServer();
         break;
       case 'm':
-        std::cout << "message all\n";
+        std::cout << "message all connected clients\n";
         client.MessageAll();
-        break;
-      case 's':
-        std::cout << "server message\n";
         break;
       case '':
         input_listening_thr.join();
@@ -151,9 +122,11 @@ int main(int argc, const char *argv[]) {
         break;
       default:
         std::cout << input_character
-                  << " is not a valid input. Please try again with a, d, p, m "
-                     "or s to interact with the server or quit the program by "
-                     "pressing q.\n";
+                  << " is not a valid input. Please try again with\n p \t "
+                     "ping\nm \t message all clients with a message that you "
+                     "will insert\nl \t list all connected clients by their "
+                     "ID\nn \t notify one of the clients by ID\nto interact "
+                     "with the server or quit the program by pressing q.\n";
       }
 
       input_listening_thr.join();

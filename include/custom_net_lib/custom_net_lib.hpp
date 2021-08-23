@@ -7,8 +7,8 @@
  */
 
 #include "common_net_includes.hpp"
-#include "net_connection_interface.hpp"
 #include "net_client.hpp"
+#include "net_connection_interface.hpp"
 #include "net_message.hpp"
 #include "net_server.hpp"
 #include "net_ts_queue.hpp"
