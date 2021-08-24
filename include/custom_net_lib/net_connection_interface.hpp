@@ -147,7 +147,7 @@ public:
     return true;
   }
 
-  void AddToIncomingMsgQueue() {
+  void AddToIncomingMsgQueue() { 
     if (owner_ == Owner::server) {
       in_msg_queue_.pushBack(
           {this->shared_from_this(),
@@ -157,6 +157,21 @@ public:
                              // initializer list
     } else {
       // The owner is a client
+    
+    /*
+    if (handshake_flag_){
+      // Test here
+      std::cout << "TEST:" << std::endl; 
+      uint32_t test1; 
+      uint32_t test2;
+      uint32_t test3;
+      std::cout << tmp_input_msg_ << std::endl;
+      custom_netlib::message<T> test = tmp_input_msg_; 
+      test >> test1 >> test2 >> test3;
+      std::cout << "test1: " << test1 << "\ntest2: " << test2 << "\ntest3: " << test3 << std::endl;  
+      std::cout << "TEST ENDED\n";  
+    }
+    */
       in_msg_queue_.pushBack({nullptr, tmp_input_msg_});
       // no owner pointer required, since clients only have one communication
       // partner
@@ -212,11 +227,21 @@ public:
   void ReadPayload() {
     boost::asio::async_read(
         socket_connection_,
-        boost::asio::buffer(tmp_input_msg_.payload.data(),
-                            tmp_input_msg_.payload.size()),
+        boost::asio::buffer(tmp_input_msg_.payload.data(), // the buffer instance should save it to the data memory of the payload vector
+                            tmp_input_msg_.payload.size()), // it should asynchronously read out the amount of bytes that are within the payload vector --> buffer instances take the number of bytes 
         [this](boost::system::error_code ec, std::size_t length) {
           // Another read handler
           if (!ec) {
+
+            // DEBUG
+            uint32_t test1; 
+            uint32_t test2;
+            uint32_t test3;
+            tmp_input_msg_ >> test1; 
+            tmp_input_msg_ >> test2;
+            tmp_input_msg_ >> test3;
+            std::cout << "received: " << test1 << ", " << test2 << " ," << test3 << std::endl; 
+
             AddToIncomingMsgQueue(); // accesses implicitly the tmp_input_msg
                                      // and adds its content to the thread save
                                      // incoming message queue
@@ -268,6 +293,21 @@ public:
         [this](boost::system::error_code ec, std::size_t length) {
           // write handler
           if (!ec) {
+                /*
+                // DEBUG
+                if (handshake_flag_){
+                  // Test here
+                  std::cout << "TEST:" << std::endl; 
+                  uint32_t test1; 
+                  uint32_t test2;
+                  uint32_t test3;
+                  std::cout << out_msg_queue_.front() << std::endl;
+                  custom_netlib::message<T> test = out_msg_queue_.front(); 
+                  test >> test1 >> test2 >> test3;
+                  std::cout << "test1: " << test1 << "\ntest2: " << test2 << "\ntest3: " << test3 << std::endl;  
+                  std::cout << "POP FRONT - TEST ENDED\n";  
+                }
+                */ 
             out_msg_queue_.popFront();
 
             if (!out_msg_queue_.isEmpty()) {
@@ -353,6 +393,7 @@ public:
                                              // connection to the client has
                                              // been validated
 
+              handshake_flag_ = true; 
               // wait for new messages from the client
               ReadHeader();
             } else {
@@ -394,6 +435,7 @@ protected:
   uint64_t handshake_out_;
   uint64_t handshake_in_;
   uint64_t handshake_check_;
+  bool handshake_flag_ = false; // debug
 };
 
 } // namespace custom_netlib

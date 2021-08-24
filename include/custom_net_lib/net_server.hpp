@@ -197,7 +197,7 @@ public:
     while (msg_count < numMaxMessages && !inMsgQueue_.isEmpty()) {
       auto msg = inMsgQueue_.popFront(); // extract the first element of the
                                          // incoming (thread save) message queue
-      onMessage(msg.remote, msg.msg);
+      onMessage(msg.remote, msg.msg); // the msg is an owned message
       msg_count++;
     }
   }

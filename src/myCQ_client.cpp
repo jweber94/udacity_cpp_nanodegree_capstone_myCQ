@@ -2,9 +2,9 @@
 
 #include <chrono>
 
-void CustomClient::PingServer() {
-  custom_netlib::message<CustomMsgTypes> msg;
-  msg.header.id = CustomMsgTypes::ServerPing;
+void MyCQClient::PingServer() {
+  custom_netlib::message<MyCQMessages> msg;
+  msg.header.id = MyCQMessages::ServerPing;
 
   std::chrono::system_clock::time_point now_pc_clock =
       std::chrono::system_clock::
@@ -17,8 +17,47 @@ void CustomClient::PingServer() {
   Send(msg);
 }
 
-void CustomClient::MessageAll() {
-  custom_netlib::message<CustomMsgTypes> msg;
-  msg.header.id = CustomMsgTypes::MessageAll;
+void MyCQClient::MessageAll() {
+  custom_netlib::message<MyCQMessages> msg;
+  msg.header.id = MyCQMessages::MessageAll;
   Send(msg);
+}
+
+void MyCQClient::RequestConnectedClientsList(){
+  custom_netlib::message<MyCQMessages> msg;
+  msg.header.id = MyCQMessages::ListAllClients; 
+
+  // test payload
+  //uint32_t test = 22;
+  //uint32_t test1 = 33;
+
+  //msg << test << test1;
+
+  Send(msg); 
+}
+
+void MyCQClient::printOtherClients(){
+  std::cout << "These are the currently connected clients:\n"; 
+  for (auto it : other_clients_){
+    std::cout << it << "\n"; 
+  }
+  std::cout << "\n\n"; 
+}
+
+uint32_t MyCQClient::getMyID(){
+  if (!myIDSet_){
+    std::cerr << "ERROR: Asking for the client ID before it was requested from the server! Setting the ID to Zero.\n";
+    return 0;
+    
+  }
+  return my_id_; 
+} 
+
+void MyCQClient::setMyID(uint32_t inID){
+  my_id_ = inID; 
+  myIDSet_ = true; 
+}
+
+void MyCQClient::setOtherClients(std::vector<uint32_t> clients_vec){
+  other_clients_ = clients_vec;
 }

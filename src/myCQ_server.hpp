@@ -4,7 +4,7 @@
 #include "custom_net_lib.hpp"
 #include <memory>
 
-enum class CustomMsgTypes : uint32_t {
+enum class MyCQMessages : uint32_t {
   MessageAll,
   ListAllClients,
   ServerPing,
@@ -12,26 +12,28 @@ enum class CustomMsgTypes : uint32_t {
   ServerAccept
 };
 
-class CustomServerLogic
-    : public custom_netlib::ServerInterfaceClass<CustomMsgTypes> {
+class MyCQServer
+    : public custom_netlib::ServerInterfaceClass<MyCQMessages> {
 public:
-  CustomServerLogic(uint16_t n_port)
-      : custom_netlib::ServerInterfaceClass<CustomMsgTypes>(n_port){};
+  MyCQServer(uint16_t n_port)
+      : custom_netlib::ServerInterfaceClass<MyCQMessages>(n_port){};
+
+  std::vector<u_int32_t> getAllClientIDs(); 
 
 protected:
   // Implementations for the virtual methods of the server interface base class
   virtual bool onClientConnect(
-      std::shared_ptr<custom_netlib::ConnectionInterface<CustomMsgTypes>>
+      std::shared_ptr<custom_netlib::ConnectionInterface<MyCQMessages>>
           client_ptr);
 
   virtual void onClientDisconnect(
-      std::shared_ptr<custom_netlib::ConnectionInterface<CustomMsgTypes>>
+      std::shared_ptr<custom_netlib::ConnectionInterface<MyCQMessages>>
           client_ptr);
 
   virtual void
-  onMessage(std::shared_ptr<custom_netlib::ConnectionInterface<CustomMsgTypes>>
+  onMessage(std::shared_ptr<custom_netlib::ConnectionInterface<MyCQMessages>>
                 client,
-            custom_netlib::message<CustomMsgTypes> &msg_input);
+            custom_netlib::message<MyCQMessages> &msg_input);
 };
 
 #endif /* MYCQSERVER */

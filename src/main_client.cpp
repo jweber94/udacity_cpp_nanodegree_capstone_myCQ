@@ -75,7 +75,7 @@ int main(int argc, const char *argv[]) {
     exit(0);
   }
 
-  CustomClient client;
+  MyCQClient client;
   // client.Connect("127.0.0.1", 60000);
   client.Connect(ip_addr, port_num);
 
@@ -104,6 +104,7 @@ int main(int argc, const char *argv[]) {
       switch (input_character) {
       case 'l':
         std::cout << "list all connected clients\n";
+        client.RequestConnectedClientsList(); 
         break;
       case 'n':
         std::cout << "notify one client\n";
@@ -147,7 +148,7 @@ int main(int argc, const char *argv[]) {
           auto msg_from_server = client.Incoming().popFront().msg;
           switch (msg_from_server.header.id) {
 
-          case CustomMsgTypes::ServerPing: {
+          case MyCQMessages::ServerPing: {
             std::chrono::system_clock::time_point response_time =
                 std::chrono::system_clock::now();
             std::chrono::system_clock::time_point request_time;
@@ -160,15 +161,60 @@ int main(int argc, const char *argv[]) {
             break;
           }
 
-          case CustomMsgTypes::MessageAll: {
+          case MyCQMessages::MessageAll: {
             uint32_t clientID;
             msg_from_server >> clientID;
             std::cout << "Hello from [" << clientID << "]\n";
+            // TODO: Maybe let the user type in a message that should be send to all other clients
             break;
           }
 
-          case CustomMsgTypes::ServerAccept: {
-            std::cout << "Server accepted connection.\n";
+          case MyCQMessages::ListAllClients: {
+            std::cout << "List of all clients:" << std::endl;
+            std::cout << "msg: " << msg_from_server << std::endl; 
+
+            uint32_t test1; 
+            uint32_t test2;
+            uint32_t test3;
+
+            msg_from_server >> test1;
+            msg_from_server >> test2;
+            msg_from_server >> test3;
+            std::cout << "test1: " << test1 << "\ntest2: " << test2 << "\ntest3: " << test3 << std::endl;  
+            
+
+            /*
+            uint32_t tmp_id; 
+            uint32_t clientID;
+            uint32_t num_IDs; 
+            std::vector<uint32_t> other_clients;
+            
+            for (int i = 0; i < 20; i++){
+              msg_from_server >> tmp_id; 
+              std::cout << tmp_id << std::endl; 
+            }
+            std::cout << "END TEST\n"; 
+
+            msg_from_server >> num_IDs;
+            msg_from_server >> clientID; // the first uint32_t element of the payload data is my requesting ID  
+            client.setMyID(clientID);
+            clientID = client.getMyID(); 
+            
+            for (int i = 0; i < num_IDs; i++){
+                // The rest of the uint32_t elements is the list of all connected clients
+                msg_from_server >> tmp_id;   
+                std::cout << tmp_id << std::endl; 
+                if (clientID == tmp_id){
+                  continue; 
+                }
+                else {
+                  other_clients.push_back(tmp_id); 
+                }
+            }
+            client.setOtherClients(other_clients);
+            std::cout << "I am the ID: " << client.getMyID() << "\n"; // DEBUG
+            client.printOtherClients(); 
+            */
             break;
           }
 

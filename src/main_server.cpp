@@ -29,10 +29,10 @@ int main(int argc, const char *argv[]) {
   }
 
   // CustomServerLogic server_test(60000);
-  CustomServerLogic server_test(port_num);
+  MyCQServer server_test(port_num);
   server_test.Start();
 
-  custom_netlib::message<CustomMsgTypes> msg_test;
+  custom_netlib::message<MyCQMessages> msg_test;
 
   std::cout << "Server was successfully created and already started!\n";
 

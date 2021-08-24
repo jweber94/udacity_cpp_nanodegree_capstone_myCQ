@@ -56,9 +56,7 @@ template <typename T> struct message {
   size_t size() const {
     // making it const in order to make clear, that the size request should not
     // edit the data in the message
-    return payload.size(); // sizeof(message_header<T>) + payload.size(); //
-                           // std::vector has a method called size, which
-                           // returns the number of bytes of the vector element
+    return payload.size(); // returns the number of bytes (=4 bit which is the amount of memory of an uint32_t)
   }
 
   // external access
@@ -84,9 +82,9 @@ template <typename T> struct message {
     size_t current_size =
         msg.payload.size(); // cache current size of the payload
 
-    msg.payload.resize(current_size + sizeof(PayloadType));
+    msg.payload.resize(msg.payload.size() + sizeof(PayloadType));
 
-    memcpy(
+    std::memcpy(
         msg.payload.data() + current_size, &data,
         sizeof(
             PayloadType)); // copy the data in the newly allocated vector space
@@ -125,7 +123,7 @@ template <typename T> struct message {
     size_t start_idx_last_element = msg.payload.size() - sizeof(PayloadType);
 
     // copy the data in byte form to the given aimed data
-    memcpy(&data, msg.payload.data() + start_idx_last_element,
+    std::memcpy(&data, msg.payload.data() + start_idx_last_element,
            sizeof(PayloadType));
     // This is the same principal as before: by copying directly in form of
     // chars in the memory blocks, the data is implicitly deserialized
