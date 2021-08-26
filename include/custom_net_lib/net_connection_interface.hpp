@@ -30,7 +30,6 @@ public:
                       TsNetQueue<OwnedMessage<T>> &input_queue)
       : io_service_object_(ioservobj), socket_connection_(std::move(sock)),
         in_msg_queue_(input_queue) {
-    std::cout << "Connection element created!\n";
     owner_ = parent;
 
     // handshake initialization
@@ -89,7 +88,6 @@ public:
     // Only necessary if the associated Owner is a server --> Only called by
     // servers => Here we can implement the handshake for the server side
     if (owner_ == Owner::server) {
-      std::cout << "[SERVER]: Connect to client.\n";
       if (socket_connection_.is_open()) {
         id_ = u_id;
 
@@ -157,21 +155,6 @@ public:
                              // initializer list
     } else {
       // The owner is a client
-    
-    /*
-    if (handshake_flag_){
-      // Test here
-      std::cout << "TEST:" << std::endl; 
-      uint32_t test1; 
-      uint32_t test2;
-      uint32_t test3;
-      std::cout << tmp_input_msg_ << std::endl;
-      custom_netlib::message<T> test = tmp_input_msg_; 
-      test >> test1 >> test2 >> test3;
-      std::cout << "test1: " << test1 << "\ntest2: " << test2 << "\ntest3: " << test3 << std::endl;  
-      std::cout << "TEST ENDED\n";  
-    }
-    */
       in_msg_queue_.pushBack({nullptr, tmp_input_msg_});
       // no owner pointer required, since clients only have one communication
       // partner
@@ -339,8 +322,8 @@ public:
 
   void ReadServerValidationRequest() {
     // ReadValidation
-    std::cout << "Read the random number from the server and calculate the "
-                 "handshake_check_.\n";
+    //std::cout << "Read the random number from the server and calculate the "
+    //             "handshake_check_.\n";
     boost::asio::async_read(
         socket_connection_,
         boost::asio::buffer(&handshake_in_, sizeof(uint64_t)),
@@ -363,11 +346,11 @@ public:
         boost::asio::buffer(&handshake_out_, sizeof(uint64_t)),
         [this](boost::system::error_code ec, std::size_t length) {
           if (!ec) {
-            std::cout << "Sending the puzzle input to the client in order to "
-                         "request the handshake.\n";
+            //std::cout << "[SERVER]: New connection request. Sending the validation request to the client.\n";
             if (owner_ == Owner::client) {
               // After the client send back the calculated validation data, we
               // want to listen for the server to talk with us
+              std::cout << "[CLIENT]: Validation successful. Ready to communicate to the server.\n"; 
               ReadHeader();
             }
           } else {
@@ -379,7 +362,7 @@ public:
   void ReadAndCheckValidation(
       custom_netlib::ServerInterfaceClass<T> *server = nullptr) {
     // ReadValidation()
-    std::cout << "Checking if the client successfully solved the puzzle.\n";
+    //std::cout << "Checking if the client successfully solved the puzzle.\n";
     boost::asio::async_read(
         socket_connection_,
         boost::asio::buffer(&handshake_in_, sizeof(uint64_t)),
@@ -387,8 +370,7 @@ public:
           if (!ec) {
             if (handshake_in_ == handshake_check_) {
               // success in validating the client
-              std::cout << "Client solved the puzzle successfully. Connection "
-                           "validated!\n";
+              //std::cout << "[SERVER]: Connection validated!\n";
               server->onClientValidated(
                   this->shared_from_this()); // Do whatever you want to do in
                                              // your server logic after the
@@ -403,11 +385,11 @@ public:
               // (i.e. an attacker has failed to enter our system --> e.g.
               // banning the clients IP address from communicating with the
               // server in the future)
-              std::cout << "Client failed to validate!\n";
+              std::cout << "[SERVER] ERROR - Client failed to validate.\n";
               socket_connection_.close();
             }
           } else {
-            std::cout << "Client disconnected (ReadServerValidationRequest)\n";
+            std::cout << "[SERVER]: Client disconnected (ReadServerValidationRequest)\n";
             socket_connection_.close();
           }
         });

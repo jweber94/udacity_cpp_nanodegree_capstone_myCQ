@@ -83,13 +83,6 @@ void MyCQServer::onMessage(
 
     msg << received_msg_from_client;
 
-    /*
-    // DEBUG
-    std::string test_str (received_msg_from_client.message); 
-    std::cout << "This is the private message from " << received_msg_from_client.sender_id << " to " << received_msg_from_client.receiver_id << std::endl; 
-    std::cout << test_str << std::endl; 
-    */
-
     for (auto it : connectionsQueue_){
       if (it->getID() == received_msg_from_client.receiver_id){
         std::cout << "Sending to " << it->getID() << std::endl; 

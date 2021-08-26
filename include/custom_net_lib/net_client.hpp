@@ -21,7 +21,6 @@ public:
   ClientBaseInterface() : connection_sock_(ioserv_) {
     // associate the I/O service object with the socker, so it can send it I/O
     // objects for execution
-    std::cout << "The client I/O context is now active.\n";
   }
 
   ~ClientBaseInterface() { this->Disconnect(); }

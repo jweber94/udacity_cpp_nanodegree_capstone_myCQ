@@ -29,7 +29,7 @@ void get_keyboard_input(std::promise<char> *promObj) {
         return;
       } else {
         // all other valid inputs
-        std::cout << " was your input.\n";
+        //std::cout << " was your input.\n";
         promObj->set_value(input);
         return;
       }

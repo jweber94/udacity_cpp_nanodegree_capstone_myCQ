@@ -80,8 +80,6 @@ public:
           // method, since it delivers always false in its default
           // implementation, so all connections get rejected (clean code
           // principals)
-          std::cout
-              << "[SERVER]: Connection is valid - connection is active now!\n";
           connectionsQueue_.emplace_back(std::move(
               new_connection)); // add
                                 // the connection object to the connections
@@ -203,7 +201,7 @@ public:
   }
   virtual void
   onClientValidated(std::shared_ptr<ConnectionInterface<T>> client) {
-    std::cout << "OnClientValidated!\n";
+    //std::cout << "OnClientValidated!\n";
     /*
      * This happens AFTER the connection was established AND the handshake
      * between the server and the client was validated. I.e a secure connecton
