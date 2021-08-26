@@ -26,13 +26,6 @@ void MyCQClient::MessageAll() {
 void MyCQClient::RequestConnectedClientsList(){
   custom_netlib::message<MyCQMessages> msg;
   msg.header.id = MyCQMessages::ListAllClients; 
-
-  // test payload
-  //uint32_t test = 22;
-  //uint32_t test1 = 33;
-
-  //msg << test << test1;
-
   Send(msg); 
 }
 

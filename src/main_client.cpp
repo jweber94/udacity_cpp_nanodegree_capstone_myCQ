@@ -9,6 +9,14 @@
 #include <stdio.h>
 #include <thread>
 
+// Payload message types
+struct ClientsListDescription {
+  uint32_t num_active_ids; 
+  uint32_t own_id; 
+  uint32_t client_ids [1000]; // maximum of 1000 clients could be send within one message
+};
+
+
 // Util functions - keyboard input
 std::set<char> possable_inputs{'p', 'm', 'l',
                                'n', 'q', ''}; // The last element is ctrl+c
@@ -171,50 +179,20 @@ int main(int argc, const char *argv[]) {
 
           case MyCQMessages::ListAllClients: {
             std::cout << "List of all clients:" << std::endl;
-            std::cout << "msg: " << msg_from_server << std::endl; 
-
-            uint32_t test1; 
-            uint32_t test2;
-            uint32_t test3;
-
-            msg_from_server >> test1;
-            msg_from_server >> test2;
-            msg_from_server >> test3;
-            std::cout << "test1: " << test1 << "\ntest2: " << test2 << "\ntest3: " << test3 << std::endl;  
             
+            // receive payload
+            ClientsListDescription received_payload; 
+            msg_from_server >> received_payload; 
 
-            /*
-            uint32_t tmp_id; 
-            uint32_t clientID;
-            uint32_t num_IDs; 
-            std::vector<uint32_t> other_clients;
-            
-            for (int i = 0; i < 20; i++){
-              msg_from_server >> tmp_id; 
-              std::cout << tmp_id << std::endl; 
+            std::cout << "I am: " << received_payload.own_id  << " and the others are: "<< std::endl;  
+            for (int i = 0; i < received_payload.num_active_ids; i++){
+              if (received_payload.client_ids[i] == received_payload.own_id){
+                continue; 
+              }
+              std::cout << received_payload.client_ids[i] << "\n"; 
             }
-            std::cout << "END TEST\n"; 
+            std::cout << "Thats all!\n"; 
 
-            msg_from_server >> num_IDs;
-            msg_from_server >> clientID; // the first uint32_t element of the payload data is my requesting ID  
-            client.setMyID(clientID);
-            clientID = client.getMyID(); 
-            
-            for (int i = 0; i < num_IDs; i++){
-                // The rest of the uint32_t elements is the list of all connected clients
-                msg_from_server >> tmp_id;   
-                std::cout << tmp_id << std::endl; 
-                if (clientID == tmp_id){
-                  continue; 
-                }
-                else {
-                  other_clients.push_back(tmp_id); 
-                }
-            }
-            client.setOtherClients(other_clients);
-            std::cout << "I am the ID: " << client.getMyID() << "\n"; // DEBUG
-            client.printOtherClients(); 
-            */
             break;
           }
 

@@ -233,6 +233,7 @@ public:
           // Another read handler
           if (!ec) {
 
+            /*
             // DEBUG
             uint32_t test1; 
             uint32_t test2;
@@ -241,6 +242,7 @@ public:
             tmp_input_msg_ >> test2;
             tmp_input_msg_ >> test3;
             std::cout << "received: " << test1 << ", " << test2 << " ," << test3 << std::endl; 
+            */
 
             AddToIncomingMsgQueue(); // accesses implicitly the tmp_input_msg
                                      // and adds its content to the thread save

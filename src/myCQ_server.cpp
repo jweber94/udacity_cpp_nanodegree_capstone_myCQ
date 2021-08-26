@@ -36,72 +36,23 @@ void MyCQServer::onMessage(
   }
 
   case MyCQMessages::ListAllClients: {
-    std::cout << "list all clients to \n"; 
-    
+    std::cout << "list all clients to \n";      
 
-    // test client --> server
-    //uint32_t test; 
-    //uint32_t test_1;
-
-    //msg_input >> test >> test_1; 
-    //std::cout << "test: " << test << std::endl; 
-    //std::cout << "test1: " << test_1 << std::endl;
+    // create payload
+    ClientsListDescription payload_msg; 
+    payload_msg.num_active_ids = connectionsQueue_.size(); 
+    payload_msg.own_id = client->getID(); 
+    size_t i = 0; 
+    for (auto it : connectionsQueue_){
+      payload_msg.client_ids[i] = connectionsQueue_[i]->getID(); 
+      i++; 
+    }
 
     // create message
     custom_netlib::message<MyCQMessages> msgLC;
     msgLC.header.id = MyCQMessages::ListAllClients;
-    //std::vector<uint32_t> ids_vec(getAllClientIDs()); 
-    //uint32_t num_of_ids = connectionsQueue_.size();
 
-    /*
-    for (auto it : ids_vec){
-      msgLC << it; // FIXME: Check if the iterator gets dereferenced automatically  
-      std::cout << it << "\n"; 
-    }
-    msgLC << client->getID(); // The second last uint32_t element of the payload is the ID of the requesting client so that he can identify which ID is he
-    msgLC << num_of_ids; // The last uint32_t element of the payload is the number of IDs that I can read out of the message (last element since we read out the last element first on the client side)
-    */
-    // DEBUG
-    //std::cout << client->getID() << std::endl; 
-    //std::cout << msgLC << std::endl; 
-    
-    uint32_t test0 = 66;
-    uint32_t test1 = 42;
-    uint32_t test2 = 1; 
-      
-    msgLC << test0 << test1 << test2; 
-
-    /*
-    uint32_t test00;
-    uint32_t test11;
-    uint32_t test22; 
-    msgLC >> test00 >> test11 >> test22; 
-    
-    std::cout << test00 << ", " << test11 << ", " << test22 << "\n";
-    */
-
-    /*
-    // DEBUG
-    std::cout << "TEST" << std::endl; 
-    uint32_t test_num; 
-    uint32_t test_id; 
-
-    msgLC >> test_num; 
-    msgLC >> test_id; 
-
-    std::cout << "test_num: " << test_num << "\ntest_id: " << test_id << std::endl; 
-
-    std::vector<uint32_t> test_vec; 
-    uint32_t tmp_element;
-    for (int i = 0; i < test_num; i++){
-      if (test_id == client->getID()){
-        continue; 
-      }
-      msgLC >> tmp_element; 
-      std::cout << msgLC << std::endl; 
-    }
-    std::cout << "END TEST" << std::endl; 
-    */
+    msgLC << payload_msg; 
 
     // send message to the requesting client
     //sendMessageToClient(client, msgLC);
@@ -117,14 +68,5 @@ void MyCQServer::onMessage(
 
   default: { break; }
   }
-}
-
-std::vector<uint32_t> MyCQServer::getAllClientIDs(){
-  std::vector<uint32_t> resultVec; 
-  for (auto it : connectionsQueue_){
-    resultVec.push_back(it->getID()); 
-  }
-  //return std::move(resultVec); 
-  return resultVec; 
 }
 
