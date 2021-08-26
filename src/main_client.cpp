@@ -79,7 +79,6 @@ int main(int argc, const char *argv[]) {
   }
 
   MyCQClient client;
-  // client.Connect("127.0.0.1", 60000);
   client.Connect(ip_addr, port_num);
 
   char input_character =
@@ -106,18 +105,17 @@ int main(int argc, const char *argv[]) {
 
       switch (input_character) {
       case 'l':
-        std::cout << "list all connected clients\n";
         client.RequestConnectedClientsList(); 
         break;
       case 'n':
-        std::cout << "notify one client\n";
+        client.NotifyOne(); 
+        std::cout << "-- Sending a private message --\n";
         break;
       case 'p':
-        std::cout << "server ping\n";
         client.PingServer();
         break;
       case 'm':
-        std::cout << "message all connected clients\n";
+        std::cout << "-- Message all connected clients --\n";
         client.MessageAll();
         break;
       case '':
@@ -195,6 +193,17 @@ int main(int argc, const char *argv[]) {
             }
 
             break;
+          }
+
+          case MyCQMessages::NotifyOneClient: {
+            // Extract data before displaying it, since we want to display the ID of the sending client
+
+            NotifyOneDescription received_msg_from_client;
+            msg_from_server >> received_msg_from_client; 
+          
+            std::cout << "-- Received private message from : " << received_msg_from_client.sender_id << "--\n"; 
+            std::cout << received_msg_from_client.message << "\n" << std::endl; 
+            break; 
           }
 
           default: {

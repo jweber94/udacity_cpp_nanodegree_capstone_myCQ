@@ -53,14 +53,6 @@ void MyCQClient::RequestConnectedClientsList(){
   Send(msg); 
 }
 
-void MyCQClient::printOtherClients(){
-  std::cout << "These are the currently connected clients:\n"; 
-  for (auto it : other_clients_){
-    std::cout << it << "\n"; 
-  }
-  std::cout << "\n\n"; 
-}
-
 uint32_t MyCQClient::getMyID(){
   if (!myIDSet_){
     std::cerr << "ERROR: Asking for the client ID before it was requested from the server! Setting the ID to Zero.\n";
@@ -77,4 +69,27 @@ void MyCQClient::setMyID(uint32_t inID){
 
 void MyCQClient::setOtherClients(std::vector<uint32_t> clients_vec){
   other_clients_ = clients_vec;
+}
+
+void MyCQClient::NotifyOne(){
+  custom_netlib::message<MyCQMessages> msg;
+  msg.header.id = MyCQMessages::NotifyOneClient; 
+
+  NotifyOneDescription payload_to_send;
+
+  std::string receiver_id; 
+  std::string written_msg; 
+
+  std::cout << "Please insert the ID of the intented receiver" << std::endl; 
+  std::getline(std::cin, receiver_id); 
+  
+  std::cout << "Please insert your message to " << receiver_id << std::endl; 
+  std::getline(std::cin, written_msg); 
+
+  payload_to_send.receiver_id = static_cast<uint32_t>(std::stoul(receiver_id)); 
+  strcpy(payload_to_send.message, written_msg.c_str()); 
+
+  msg << payload_to_send; 
+
+  Send(msg); 
 }

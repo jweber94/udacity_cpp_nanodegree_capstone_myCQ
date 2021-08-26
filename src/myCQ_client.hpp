@@ -20,7 +20,7 @@ public:
   void PingServer();
   void MessageAll();
   void RequestConnectedClientsList(); 
-  void printOtherClients();
+  void NotifyOne(); 
   void setMyID(uint32_t inID); 
   uint32_t getMyID(); 
   void setOtherClients(std::vector<uint32_t> clients_vec); 
