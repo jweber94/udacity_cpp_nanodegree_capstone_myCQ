@@ -8,13 +8,7 @@
 #include <set>
 #include <stdio.h>
 #include <thread>
-
-// Payload message types
-struct ClientsListDescription {
-  uint32_t num_active_ids; 
-  uint32_t own_id; 
-  uint32_t client_ids [1000]; // maximum of 1000 clients could be send within one message
-};
+#include "payload_definitions.hpp"
 
 
 // Util functions - keyboard input
@@ -40,12 +34,13 @@ void get_keyboard_input(std::promise<char> *promObj) {
         return;
       }
     } else {
+      /*
       std::cout << " was your input which is not a valid. Please try again "
                    "with\n p \t "
                    "ping\nm \t message all clients with a message that you "
                    "will insert\nl \t list all connected clients by their "
                    "ID\nn \t notify one of the clients by ID\nto interact "
-                   "with the server or quit the program by pressing q.\n\n";
+                   "with the server or quit the program by pressing q.\n\n";*/
     }
   }
 }
@@ -157,28 +152,35 @@ int main(int argc, const char *argv[]) {
           switch (msg_from_server.header.id) {
 
           case MyCQMessages::ServerPing: {
+            std::cout << "-- Server ping --\n";
             std::chrono::system_clock::time_point response_time =
                 std::chrono::system_clock::now();
             std::chrono::system_clock::time_point request_time;
             msg_from_server >> request_time;
-            std::cout << "Ping: "
+            std::cout << "Round trip time: "
                       << std::chrono::duration<double>(response_time -
                                                        request_time)
                              .count()
-                      << "\n";
+                      << "\n" << std::endl; 
             break;
           }
 
           case MyCQMessages::MessageAll: {
             uint32_t clientID;
-            msg_from_server >> clientID;
-            std::cout << "Hello from [" << clientID << "]\n";
-            // TODO: Maybe let the user type in a message that should be send to all other clients
+            MessageAllDescription input_msg_all; 
+
+            msg_from_server >> input_msg_all;
+            std::cout << "-- Message to all from [" << input_msg_all.sender_id << "] --\n";
+
+            // Extract and display message
+            std::string printout_str(input_msg_all.message); 
+            std::cout << printout_str << "\n" << std::endl; 
+
             break;
           }
 
           case MyCQMessages::ListAllClients: {
-            std::cout << "List of all clients:" << std::endl;
+            std::cout << "-- List of all clients --" << std::endl;
             
             // receive payload
             ClientsListDescription received_payload; 
@@ -189,15 +191,13 @@ int main(int argc, const char *argv[]) {
               if (received_payload.client_ids[i] == received_payload.own_id){
                 continue; 
               }
-              std::cout << received_payload.client_ids[i] << "\n"; 
+              std::cout << received_payload.client_ids[i] << "\n" << std::endl; 
             }
-            std::cout << "Thats all!\n"; 
 
             break;
           }
 
           default: {
-            std::cout << "Default case!\n";
             break;
           }
           }

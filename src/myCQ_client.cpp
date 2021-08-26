@@ -1,6 +1,9 @@
 #include "myCQ_client.hpp"
 
 #include <chrono>
+#include <cstring>
+#include <string>
+#include <mutex>
 
 void MyCQClient::PingServer() {
   custom_netlib::message<MyCQMessages> msg;
@@ -20,6 +23,27 @@ void MyCQClient::PingServer() {
 void MyCQClient::MessageAll() {
   custom_netlib::message<MyCQMessages> msg;
   msg.header.id = MyCQMessages::MessageAll;
+
+  // create payload
+  MessageAllDescription message_payload;
+  std::string input_str;// = "This is a test string";
+
+  std::unique_lock<std::mutex> lck(input_mtx_); 
+  
+  std::cout << "Please insert your message:\n"; 
+  std::getline(std::cin, input_str); 
+  
+  // Check if a valid message was inserted
+  if (input_str.size() > 2048){
+    std::cerr << "Your message was too long!\n"; 
+    exit(0); 
+  }  
+
+  strcpy(message_payload.message, input_str.c_str());
+
+  // insert payload to the message
+  msg << message_payload; 
+
   Send(msg);
 }
 

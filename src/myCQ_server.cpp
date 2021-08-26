@@ -30,7 +30,18 @@ void MyCQServer::onMessage(
     std::cout << "[" << client->getID() << "]: Message all\n";
     custom_netlib::message<MyCQMessages> msg;
     msg.header.id = MyCQMessages::MessageAll;
-    msg << client->getID();
+    //msg << client->getID();
+
+    // get the message from the client: 
+    MessageAllDescription payload_from_client;
+    msg_input >> payload_from_client;  
+
+    // Update message from client
+    payload_from_client.sender_id = client->getID();
+    
+    // insert the updated payload and send it to all other clients
+    msg << payload_from_client; 
+    
     sendMessageToAllClients(msg, client); // just return the header
     break;
   }
@@ -51,11 +62,9 @@ void MyCQServer::onMessage(
     // create message
     custom_netlib::message<MyCQMessages> msgLC;
     msgLC.header.id = MyCQMessages::ListAllClients;
-
     msgLC << payload_msg; 
 
     // send message to the requesting client
-    //sendMessageToClient(client, msgLC);
     client->SendData(msgLC);  
 
     break; 

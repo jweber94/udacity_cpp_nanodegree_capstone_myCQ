@@ -3,6 +3,7 @@
 
 #include "custom_net_lib.hpp"
 #include <memory>
+#include "payload_definitions.hpp"
 
 enum class MyCQMessages : uint32_t {
   MessageAll,
@@ -11,13 +12,6 @@ enum class MyCQMessages : uint32_t {
   NotifyOneClient,
   ServerAccept
 };
-
-struct ClientsListDescription {
-  uint32_t num_active_ids; 
-  uint32_t own_id; 
-  uint32_t client_ids [1000]; // maximum of 1000 clients could be send within one message
-};
-
 
 class MyCQServer
     : public custom_netlib::ServerInterfaceClass<MyCQMessages> {
