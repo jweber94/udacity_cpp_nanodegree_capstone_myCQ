@@ -195,13 +195,13 @@ public:
     while (msg_count < numMaxMessages && !inMsgQueue_.isEmpty()) {
       auto msg = inMsgQueue_.popFront(); // extract the first element of the
                                          // incoming (thread save) message queue
-      onMessage(msg.remote, msg.msg); // the msg is an owned message
+      onMessage(msg.remote, msg.msg);    // the msg is an owned message
       msg_count++;
     }
   }
   virtual void
   onClientValidated(std::shared_ptr<ConnectionInterface<T>> client) {
-    //std::cout << "OnClientValidated!\n";
+    // std::cout << "OnClientValidated!\n";
     /*
      * This happens AFTER the connection was established AND the handshake
      * between the server and the client was validated. I.e a secure connecton

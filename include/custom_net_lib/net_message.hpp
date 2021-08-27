@@ -56,7 +56,8 @@ template <typename T> struct message {
   size_t size() const {
     // making it const in order to make clear, that the size request should not
     // edit the data in the message
-    return payload.size(); // returns the number of bytes (=4 bit which is the amount of memory of an uint32_t)
+    return payload.size(); // returns the number of bytes (=4 bit which is the
+                           // amount of memory of an uint32_t)
   }
 
   // external access
@@ -124,7 +125,7 @@ template <typename T> struct message {
 
     // copy the data in byte form to the given aimed data
     std::memcpy(&data, msg.payload.data() + start_idx_last_element,
-           sizeof(PayloadType));
+                sizeof(PayloadType));
     // This is the same principal as before: by copying directly in form of
     // chars in the memory blocks, the data is implicitly deserialized
 

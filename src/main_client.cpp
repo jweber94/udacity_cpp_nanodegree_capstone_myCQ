@@ -1,6 +1,7 @@
 #include "custom_net_lib.hpp"
 #include "myCQ_client.hpp"
 
+#include "payload_definitions.hpp"
 #include <boost/program_options.hpp>
 #include <chrono>
 #include <future>
@@ -8,8 +9,6 @@
 #include <set>
 #include <stdio.h>
 #include <thread>
-#include "payload_definitions.hpp"
-
 
 // Util functions - keyboard input
 std::set<char> possable_inputs{'p', 'm', 'l',
@@ -29,7 +28,7 @@ void get_keyboard_input(std::promise<char> *promObj) {
         return;
       } else {
         // all other valid inputs
-        //std::cout << " was your input.\n";
+        // std::cout << " was your input.\n";
         promObj->set_value(input);
         return;
       }
@@ -105,10 +104,10 @@ int main(int argc, const char *argv[]) {
 
       switch (input_character) {
       case 'l':
-        client.RequestConnectedClientsList(); 
+        client.RequestConnectedClientsList();
         break;
       case 'n':
-        client.NotifyOne(); 
+        client.NotifyOne();
         std::cout << "-- Sending a private message --\n";
         break;
       case 'p':
@@ -159,56 +158,59 @@ int main(int argc, const char *argv[]) {
                       << std::chrono::duration<double>(response_time -
                                                        request_time)
                              .count()
-                      << "\n" << std::endl; 
+                      << "\n"
+                      << std::endl;
             break;
           }
 
           case MyCQMessages::MessageAll: {
             uint32_t clientID;
-            MessageAllDescription input_msg_all; 
+            MessageAllDescription input_msg_all;
 
             msg_from_server >> input_msg_all;
-            std::cout << "-- Message to all from [" << input_msg_all.sender_id << "] --\n";
+            std::cout << "-- Message to all from [" << input_msg_all.sender_id
+                      << "] --\n";
 
             // Extract and display message
-            std::string printout_str(input_msg_all.message); 
-            std::cout << printout_str << "\n" << std::endl; 
+            std::string printout_str(input_msg_all.message);
+            std::cout << printout_str << "\n" << std::endl;
 
             break;
           }
 
           case MyCQMessages::ListAllClients: {
             std::cout << "-- List of all clients --" << std::endl;
-            
-            // receive payload
-            ClientsListDescription received_payload; 
-            msg_from_server >> received_payload; 
 
-            std::cout << "I am: " << received_payload.own_id  << " and the others are: "<< std::endl;  
-            for (int i = 0; i < received_payload.num_active_ids; i++){
-              if (received_payload.client_ids[i] == received_payload.own_id){
-                continue; 
+            // receive payload
+            ClientsListDescription received_payload;
+            msg_from_server >> received_payload;
+
+            std::cout << "I am: " << received_payload.own_id
+                      << " and the others are: " << std::endl;
+            for (int i = 0; i < received_payload.num_active_ids; i++) {
+              if (received_payload.client_ids[i] == received_payload.own_id) {
+                continue;
               }
-              std::cout << received_payload.client_ids[i] << "\n" << std::endl; 
+              std::cout << received_payload.client_ids[i] << "\n" << std::endl;
             }
 
             break;
           }
 
           case MyCQMessages::NotifyOneClient: {
-            // Extract data before displaying it, since we want to display the ID of the sending client
+            // Extract data before displaying it, since we want to display the
+            // ID of the sending client
 
             NotifyOneDescription received_msg_from_client;
-            msg_from_server >> received_msg_from_client; 
-          
-            std::cout << "-- Received private message from : " << received_msg_from_client.sender_id << "--\n"; 
-            std::cout << received_msg_from_client.message << "\n" << std::endl; 
-            break; 
-          }
+            msg_from_server >> received_msg_from_client;
 
-          default: {
+            std::cout << "-- Received private message from : "
+                      << received_msg_from_client.sender_id << "--\n";
+            std::cout << received_msg_from_client.message << "\n" << std::endl;
             break;
           }
+
+          default: { break; }
           }
 
         } else {

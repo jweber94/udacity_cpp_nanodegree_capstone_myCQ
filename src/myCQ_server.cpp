@@ -30,69 +30,68 @@ void MyCQServer::onMessage(
     std::cout << "[" << client->getID() << "]: Message all\n";
     custom_netlib::message<MyCQMessages> msg;
     msg.header.id = MyCQMessages::MessageAll;
-    //msg << client->getID();
+    // msg << client->getID();
 
-    // get the message from the client: 
+    // get the message from the client:
     MessageAllDescription payload_from_client;
-    msg_input >> payload_from_client;  
+    msg_input >> payload_from_client;
 
     // Update message from client
     payload_from_client.sender_id = client->getID();
-    
+
     // insert the updated payload and send it to all other clients
-    msg << payload_from_client; 
-    
+    msg << payload_from_client;
+
     sendMessageToAllClients(msg, client); // just return the header
     break;
   }
 
   case MyCQMessages::ListAllClients: {
-    std::cout << "list all clients to \n";      
+    std::cout << "list all clients to \n";
 
     // create payload
-    ClientsListDescription payload_msg; 
-    payload_msg.num_active_ids = connectionsQueue_.size(); 
-    payload_msg.own_id = client->getID(); 
-    size_t i = 0; 
-    for (auto it : connectionsQueue_){
-      payload_msg.client_ids[i] = connectionsQueue_[i]->getID(); 
-      i++; 
+    ClientsListDescription payload_msg;
+    payload_msg.num_active_ids = connectionsQueue_.size();
+    payload_msg.own_id = client->getID();
+    size_t i = 0;
+    for (auto it : connectionsQueue_) {
+      payload_msg.client_ids[i] = connectionsQueue_[i]->getID();
+      i++;
     }
 
     // create message
     custom_netlib::message<MyCQMessages> msgLC;
     msgLC.header.id = MyCQMessages::ListAllClients;
-    msgLC << payload_msg; 
+    msgLC << payload_msg;
 
     // send message to the requesting client
-    client->SendData(msgLC);  
+    client->SendData(msgLC);
 
-    break; 
+    break;
   }
 
-  case MyCQMessages::NotifyOneClient:{
+  case MyCQMessages::NotifyOneClient: {
     std::cout << "notify one client\n"; // FIXME
-    custom_netlib::message<MyCQMessages> msg; 
+    custom_netlib::message<MyCQMessages> msg;
 
-    msg.header.id = MyCQMessages::NotifyOneClient; 
-    
+    msg.header.id = MyCQMessages::NotifyOneClient;
+
     // create paylaod
-    NotifyOneDescription received_msg_from_client; 
-    msg_input >> received_msg_from_client; 
-    received_msg_from_client.sender_id = client->getID(); 
+    NotifyOneDescription received_msg_from_client;
+    msg_input >> received_msg_from_client;
+    received_msg_from_client.sender_id = client->getID();
 
     msg << received_msg_from_client;
 
-    for (auto it : connectionsQueue_){
-      if (it->getID() == received_msg_from_client.receiver_id){
-        std::cout << "Sending to " << it->getID() << std::endl; 
-        it->SendData(msg); 
-      } 
+    for (auto it : connectionsQueue_) {
+      if (it->getID() == received_msg_from_client.receiver_id) {
+        std::cout << "Sending to " << it->getID() << std::endl;
+        it->SendData(msg);
+      }
     }
-    break; 
+    break;
   }
 
   default: { break; }
   }
 }
-
