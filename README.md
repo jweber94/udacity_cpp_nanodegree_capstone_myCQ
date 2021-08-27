@@ -1,9 +1,9 @@
 # CPPND: Capstone myCQ
 
 This is the Capstone Project of the udacity C++ nanodegree that I have done from june 2021 until september 2021. I decided to to my own, custom project and just rely on the given starter repository that can be found in [0]. I used this project in order to finish the nanodegree by doing this project as my capstone programming assignment by showing off my skills that I have learned during the programm and learn about networking in C++.
-Therefore, I developed a client-server chat application, called myCQ. The aim of the project is to use a self-developed networking framework that is based on the video lecture series that can be found in [1], in order to implement a server application that is able to receive connections and requests from multiple client applications. The implemented client applications can ping the server for a check of the connection to the server, they can message all clients that are currently connected to the server, they can request a list of all connected clients from the server and can send a message to a specific client. The user of the chat-client application can interact with application purely over the terminal in which the client-application is running. Therefore, a plain C++ asynchronous keyboard interface is implemented. The server application is used to organize the connections and exchange the messages between the connected clients. 
+Therefore, I developed a client-server chat application, called myCQ. The aim of the project is to use a networking framework that is based on the video lecture series that can be found in [1], in order to implement a server application that is able to receive connections and requests from multiple client applications. The implemented client applications can ping the server for a check of the connection to the server, they can message all clients that are currently connected to the server, they can request a list of all connected clients from the server and can send a message to a specific client. The user of the chat-client application can interact with application purely over the terminal in which the client-application is running. Therefore, a plain C++ asynchronous keyboard interface is implemented. The server application is used to organize the connections and exchange the messages between the connected clients. 
 
-Other ressources, that I used to familiarize myself with networking in C++ and from which I gained inspiration for the implementation can be found in [1], [2] and [3]. Even if the header based networking library is mainly based on [1], I programmed and refactored it completly on my own, in order to make it suitable for the myCQ application.     
+Ressources that I used to familiarize myself with networking in C++ and from which I gained inspiration for the implementation can be found in [1], [2] and [3]. Even if the header based networking library is mainly based on [1], I reimplemented on my own in order to learn about networking and asynchronous programming with C++ and about networking in general.     
 
 [0]: https://github.com/udacity/CppND-Capstone-Hello-World 
 
@@ -66,9 +66,6 @@ The MyCQ server is implemented in a similar way as the client. Also the ```myCQ_
 
 In ```main_client.cpp``` as well as ```main_server.cpp```, an interface for handing over the IP-address as well as the port via the terminal call of the individual executables is implemented, using the ```boost::program_options``` library. 
 
-## Expected behaviour of the application
-This screencast shows the expected behaviour.
-
 ## Code - Udacity Rubric referencing 
 In order to complete my capstone project, I have to reference at least five of the not required rubric points that can be found in https://review.udacity.com/#!/rubrics/2533/view. In the following table, the mapping between the rubric point and my code is shown. Besides from the five described code sections in the table, I used most of the rubrics points within the project, but the listed ones are the most clear ones, in order to complete the capstone project.   
 
@@ -95,6 +92,9 @@ Other components that are used in many places within the project:
 * Templates generalize functions in the project: 
   - The complete custom_net_lib library is template based
 
+## Expected behaviour of the application
+This screencast shows the expected behaviour.
+![Usage](/images/demo.gif)
 
 ## Main takeaways
 + I learned a lot about asynchronous and concurrent programming. This is a key element whenever we want to interact with the network, since we are not under control of the program flow, after we send out a request or a message to the server/client
@@ -106,3 +106,8 @@ Other components that are used in many places within the project:
 + I learned how to use condition variables to block a thread that is waiting for an asynchronous event to happen (i.e. waiting for an incoming message), so that the processor is not occupied the complete waiting time. (see: net_ts_queue.hpp)
 + It is the best way to standartize the payload with a defined payload datastructure that is serializable and just send one payload per message! (Example: If you are makeing a HTTP request, the maximum number of byts per payload is also restricted to a fixed number)
   - Top Tip: Sometimes it is useful to define a form that the client sends to the server with already established information and that let the server fill out the missing parts of the datastructure
+
+## Possable extensions
+[ ] Find a way to avoid to remain within the raw terminal interface for the user input on the client application. 
+[ ] Add a SQL Database to the Server in order to learn about databases and create a dataset for makeing statistics about the network connections
+[ ] Make the payload encrypted and learn about encrytion of internet traffic

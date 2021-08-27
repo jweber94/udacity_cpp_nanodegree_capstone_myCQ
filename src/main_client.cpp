@@ -107,8 +107,8 @@ int main(int argc, const char *argv[]) {
         client.RequestConnectedClientsList();
         break;
       case 'n':
-        client.NotifyOne();
         std::cout << "-- Sending a private message --\n";
+        client.NotifyOne();
         break;
       case 'p':
         client.PingServer();

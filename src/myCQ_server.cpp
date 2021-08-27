@@ -12,7 +12,7 @@ bool MyCQServer::onClientConnect(
 void MyCQServer::onClientDisconnect(
     std::shared_ptr<custom_netlib::ConnectionInterface<MyCQMessages>>
         client_ptr) {
-  std::cout << "Removing client [" << client_ptr->getID() << "]\n";
+  std::cout << "[SERVER]: Removing client [" << client_ptr->getID() << "]\n";
 }
 
 void MyCQServer::onMessage(
@@ -21,13 +21,13 @@ void MyCQServer::onMessage(
   switch (msg_input.header.id) {
 
   case MyCQMessages::ServerPing: {
-    std::cout << "[" << client->getID() << "]: Server ping\n";
+    //std::cout << "[" << client->getID() << "]: Server ping\n";
     client->SendData(msg_input);
     break;
   }
 
   case MyCQMessages::MessageAll: {
-    std::cout << "[" << client->getID() << "]: Message all\n";
+    //std::cout << "[" << client->getID() << "]: Message all\n";
     custom_netlib::message<MyCQMessages> msg;
     msg.header.id = MyCQMessages::MessageAll;
     // msg << client->getID();
@@ -47,7 +47,7 @@ void MyCQServer::onMessage(
   }
 
   case MyCQMessages::ListAllClients: {
-    std::cout << "list all clients to \n";
+    //std::cout << "list all clients to \n";
 
     // create payload
     ClientsListDescription payload_msg;
@@ -71,7 +71,7 @@ void MyCQServer::onMessage(
   }
 
   case MyCQMessages::NotifyOneClient: {
-    std::cout << "notify one client\n"; // FIXME
+    //std::cout << "notify one client\n"; // FIXME
     custom_netlib::message<MyCQMessages> msg;
 
     msg.header.id = MyCQMessages::NotifyOneClient;
@@ -85,7 +85,7 @@ void MyCQServer::onMessage(
 
     for (auto it : connectionsQueue_) {
       if (it->getID() == received_msg_from_client.receiver_id) {
-        std::cout << "Sending to " << it->getID() << std::endl;
+        //std::cout << "Sending to " << it->getID() << std::endl;
         it->SendData(msg);
       }
     }
