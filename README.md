@@ -70,11 +70,30 @@ In ```main_client.cpp``` as well as ```main_server.cpp```, an interface for hand
 This screencast shows the expected behaviour.
 
 ## Code - Udacity Rubric referencing 
-In order to complete my capstone project, I have to reference at least five of the not required rubric points that can be found in https://review.udacity.com/#!/rubrics/2533/view. In the following table, the mapping between the rubric point and my code is shown. 
+In order to complete my capstone project, I have to reference at least five of the not required rubric points that can be found in https://review.udacity.com/#!/rubrics/2533/view. In the following table, the mapping between the rubric point and my code is shown. Besides from the five described code sections in the table, I used most of the rubrics points within the project, but the listed ones are the most clear ones, in order to complete the capstone project.   
 
-| Rubric point  | File          | Line  |
-| ------------- |:-------------:| -----:|
-| Fixme         | Fixme         | Fixme |
+| Rubric point  | File          | Line  | Explaination |
+| ------------- |:-------------:|:-------------:| -----:|
+| ***Classes follow an appropriate inheritance hierarchy*** & ***Derived class functions override virtual base class functions*** | net_server.hpp, myCQ_server.hpp & myCQ_server.cpp | net_server.hpp-line 215 to 265, myCQ_server.cpp-complete file | The net_server.hpp implementation defines a base class that describes the behaviour that all servers need and set the virtual methods from line 215 to 265 as an interface for the implementation of the derived MyCQServer class. |
+| ***The project uses smart pointers instead of raw pointers.*** | net_client.hpp | 119 | The ```ConnectionInterface``` is created as a unique_ptr, since it needs to be exclusivly owned by the client. Other smartpointers are also used within the net_client.hpp implementation for a similar purpose. No raw pointers are used within the project. |
+| ***The project uses multithreading.*** | main_client.cpp | 87 to 89 | A separate thread is used to let the user interact with the client application concurrently to the running message processing. |
+| ***A promise and future is used in the project.*** | main_client.cpp | 86 - 90 | A promise-future approach is used to make the user input available within the main thread of execution within the myCQ client application. |
+| ***A mutex or lock is used in the project.*** | myCQ_client.cpp | 74 - 95 | The ```std::cin``` ressource is lock by a unique_lock in order to make the user input thread safe. |
+| ***A condition variable is used in the project.*** | net_ts_queue.hpp | 104 - 105 & 38 to 59 | The condition variable is set in order to block the execution of the thread where the ```wait()``` method of the thread safe queue is called. If we do not block the thread, one complete processor core will be working near 100%, since it always checks for new messages within the queue. This is prevented by the condition variable that gets notifyed whenever a new element is inserted by ```pushBack()``` or ```pushFront()```. |
+
+Other components that are used in many places within the project: 
+* The project demonstrates an understanding of C++ functions and control structures: 
+  - e.g. ```main_client.cpp``` with the switch-case and if statements as well as the little utility functions that are defined before the ```int main()```.
+* The project accepts user input and processes the input:
+  - This is especially done within the ```main_client.cpp``` by starting a thread for the user input as well as using the ```boost::program_options``` library in order to hand over terminal inputs on the program startup. 
+* The project uses Object Oriented Programming techniques.
+  - The most parts of the code is programmed in a object oriented way. Only the utility functions within ```main_client.cpp``` and the entry points for the executables are not object oriented. 
+* The project makes use of references in function declarations: 
+  - This is especially done in the lambda functions for the asynchronous ```boost::asio``` handlers. 
+* Classes use appropriate access specifiers for class members:
+  - All class members in all classes are explicitly defined as public, private or protected. 
+* Templates generalize functions in the project: 
+  - The complete custom_net_lib library is template based
 
 
 ## Main takeaways
